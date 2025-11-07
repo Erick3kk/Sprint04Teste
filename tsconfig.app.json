@@ -24,5 +24,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src",
+"src/services/types/**/*.ts"
+],
+"references": [{ "path": "./tsconfig.node.json" }]
 }

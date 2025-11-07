@@ -23,7 +23,7 @@ export const ServiceCard: React.FC<CardProps> = ({ titulo, descricao, icone }) =
         <p className="text-gray-600 text-base">{descricao}</p>
         
         {}
-        <a href="/agendamento" className="mt-4 inline-block text-hc-secundaria font-bold hover:text-hc-principal hover:underline transition duration-150">
+        <a href="/agendamento" className="text-gray-700 mt-4 inline-block text-hc-secundaria font-bold hover:text-hc-principal hover:underline transition duration-150">
             Saiba Mais →
         </a>
     </div>

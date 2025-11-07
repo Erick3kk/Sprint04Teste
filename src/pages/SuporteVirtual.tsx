@@ -22,12 +22,12 @@ const SuporteVirtual: React.FC = () => {
     ];
 
     return (
-        <div className="p-4 md:p-8 bg-hc-fundo min-h-screen">
+        <div className="p-4 md:p-8 bg-hc-fundo min-h-screen text-gray-700 ">
             <div className="container mx-auto max-w-4xl">
                 
                 <header className="text-center mb-10">
                     {}
-                    <h1 className="text-4xl font-extrabold text-hc-principal mb-2">Perguntas Frequentes (FAQ)</h1>
+                    <h1 className="text-white-700 text-4xl font-extrabold text-hc-principal mb-2">Perguntas Frequentes (FAQ)</h1>
                     <p className="text-lg text-gray-600">Encontre respostas rápidas para suas dúvidas sobre nossos serviços.</p>
                 </header>
 

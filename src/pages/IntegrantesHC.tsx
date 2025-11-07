@@ -27,7 +27,7 @@ const IntegrantesHC: React.FC = () => {
     ];
 
     return (
-        <div className="p-4 sm:p-8 bg-hc-fundo min-h-screen">
+        <div className="text-gray-700 p-4 sm:p-8 bg-hc-fundo min-h-screen">
             <div className="container mx-auto max-w-6xl">
                 
                 {}

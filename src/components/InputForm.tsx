@@ -1,38 +1,40 @@
+// src/components/InputForm.tsx
 import React from 'react';
-import { UseFormRegister, FieldValues, FieldErrors, RegisterOptions, Path } from 'react-hook-form';
+import { UseFormRegister, FieldErrors } from 'react-hook-form';
 
-
-interface InputProps<T extends FieldValues> {
+interface InputFormProps {
   label: string;
-  name: Path<T>;
+  name: string;
   type?: string;
-  register: UseFormRegister<T>;
-  errors: FieldErrors<T>;
-  rules?: RegisterOptions<T, Path<T>>; 
+  register: UseFormRegister<any>;
+  errors: FieldErrors<any>;
+  [key: string]: any;
 }
 
-export const InputForm = <T extends FieldValues>({
+export const InputForm: React.FC<InputFormProps> = ({
   label,
   name,
-  type = "text",
+  type = 'text',
   register,
   errors,
-  rules
-}: InputProps<T>) => {
+  ...rest
+}) => {
+  const error = errors[name]?.message as string | undefined;
+
   return (
-    <div className="mb-4">
-      <label htmlFor={name} className="block text-gray-700 font-medium mb-1">{label}</label>
+    <div className="space-y-1">
+      <label className="block text-sm font-medium text-gray-700">
+        {label}
+      </label>
       <input
-        id={name}
         type={type}
-        className={`w-full p-3 border rounded-md transition duration-150 
-          ${errors[name] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-hc-secundaria focus:border-hc-secundaria'}`}
-        {...register(name, rules)} 
+        {...register(name)}
+        {...rest}
+        className={`w-full p-3 border rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+          error ? 'border-red-500' : 'border-gray-300'
+        }`}
       />
-      {}
-      {errors[name]?.message && (
-        <p className="text-red-500 text-sm mt-1">{String(errors[name]?.message)}</p>
-      )}
+      {error && <p className="text-red-500 text-xs">{error}</p>}
     </div>
   );
 };

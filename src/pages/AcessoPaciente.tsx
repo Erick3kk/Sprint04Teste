@@ -1,64 +1,138 @@
-import React, { useState } from 'react';
-import { useForm, SubmitHandler, FieldValues } from 'react-hook-form';
-import { InputForm } from '../components/InputForm'; 
+import { useState } from 'react';
+import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 
+export default function AcessoPaciente() {
+  const [cpf, setCpf] = useState('');
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState('');
+  const navigate = useNavigate();
 
-const AcessoPaciente: React.FC = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<any>(); 
+  // FORMATA CPF AUTOMATICAMENTE
+  const formatarCPF = (valor: string) => {
+    return valor
+      .replace(/\D/g, '')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+      .replace(/(-\d{2})\d+?$/, '$1');
+  };
 
-  const onSubmit: SubmitHandler<FieldValues> = data => {
-    if (isLogin) {
-      console.log("Tentativa de Login:", data);
-      alert("Login efetuado com sucesso! Bem-vindo(a) ao Portal HC.");
-    } else {
-      console.log("Dados de Cadastro:", data);
-      alert("Cadastro realizado! Por favor, faça seu login.");
+  const fazerLogin = async () => {
+    if (!cpf || !email) {
+      setErro('Preencha CPF e Email');
+      return;
     }
-    reset();
+
+    setLoading(true);
+    setErro('');
+
+    const cpfLimpo = cpf.replace(/\D/g, '');
+
+    try {
+      // ENVIA CPF + EMAIL PARA O BACKEND
+      const res = await axios.post('http://localhost:8080/login', {
+        cpf: cpfLimpo,
+        email: email.trim().toLowerCase()
+      });
+
+      const usuario = res.data;
+
+      if (!usuario?.idPaciente) {
+        setErro('Paciente não encontrado');
+        setLoading(false);
+        return;
+      }
+
+      // SALVA NO LOCALSTORAGE
+      localStorage.setItem('usuarioLogado', JSON.stringify({
+        idPaciente: usuario.idPaciente,
+        nome: usuario.nome || 'Paciente',
+        cpf: usuario.cpf,
+        email: usuario.email
+      }));
+
+      alert(`Bem-vindo, ${usuario.nome || 'Paciente'}!`);
+      navigate('/dashboard-paciente');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || 'CPF ou Email incorretos';
+      setErro(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="flex justify-center p-4 md:p-8 bg-hc-fundo min-h-screen"> 
-      {}
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-2xl border border-hc-principal/10">
-        
-        {}
-        <h1 className="text-3xl font-extrabold text-hc-principal mb-2 text-center border-b pb-2">
-          {isLogin ? 'Acesso ao Portal do Paciente' : 'Cadastro de Novo Paciente'}
-        </h1>
-        <p className="text-gray-600 mb-8 text-center">
-          {isLogin ? 'Entre com seu documento e senha.' : 'Crie sua conta para acessar seus dados.'}
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center p-6">
+      <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Portal do Paciente</h1>
+          <p className="text-gray-600">Acesse com CPF e Email</p>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)}> 
-          
-          {}
+        {erro && (
+          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 text-sm font-medium">
+            {erro}
+          </div>
+        )}
 
-          {}
-          <button 
-            type="submit" 
-            className="mt-6 w-full bg-hc-secundaria text-white font-bold py-3 rounded-lg shadow-lg hover:bg-hc-principal transition duration-150 focus:outline-none focus:ring-4 focus:ring-hc-secundaria/70 active:scale-[0.99]"
+        <div className="space-y-6">
+          {/* CPF */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              CPF
+            </label>
+            <input
+              type="text"
+              placeholder="000.000.000-00"
+              value={cpf}
+              onChange={(e) => setCpf(formatarCPF(e.target.value))}
+              maxLength={14}
+              className="w-full p-4 border border-gray-300 rounded-xl text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            />
+          </div>
+
+          {/* EMAIL */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-xl text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            />
+          </div>
+
+          {/* BOTÃO */}
+          <button
+            onClick={fazerLogin}
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-70 transition shadow-lg"
           >
-            {isLogin ? 'Acessar Conta' : 'Finalizar Cadastro'}
+            {loading ? 'Entrando...' : 'Acessar Portal'}
           </button>
-        </form>
+        </div>
+        
+        <div className="flex justify-center my-12">
+          <Link
+            to="/cadastro"
+            className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-12 py-5 rounded-xl font-bold text-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-xl transform hover:scale-105 active:scale-95"
+          >
+            Cadastre-se
+          </Link>
+        </div>
 
-        {}
-        <div className="mt-6 text-center border-t pt-4 border-gray-100"> {}
-          <p className="text-gray-800">
-            {isLogin ? 'Não tem conta?' : 'Já tem um cadastro?'}
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="ml-2 font-extrabold text-hc-principal hover:text-hc-secundaria hover:underline transition duration-150"
-            >
-              {isLogin ? 'Cadastre-se Aqui' : 'Fazer Login'}
-            </button>
-          </p>
+        <div className="mt-8 text-center text-sm text-gray-600">
+          <p>Problemas com acesso?</p>
+          <a href="tel:+5511999999999" className="text-blue-600 hover:underline font-medium">
+            Suporte: (11) 99999-9999
+          </a>
         </div>
       </div>
     </div>
   );
-};
-
-export default AcessoPaciente;
+}

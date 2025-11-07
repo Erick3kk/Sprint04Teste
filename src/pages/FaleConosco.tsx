@@ -24,7 +24,7 @@ const FaleConosco: React.FC = () => {
       <div className="w-full max-w-2xl bg-white p-8 rounded-2xl shadow-xl">
         
         {}
-        <h1 className="text-3xl font-extrabold text-hc-principal mb-2 text-center border-b pb-2">Entre em Contato</h1>
+        <h1 className="text-3xl text-gray-700 font-extrabold text-hc-principal mb-2 text-center border-b pb-2">Entre em Contato</h1>
         <p className="text-gray-500 mb-8 text-center">Use o formulário abaixo ou veja nossos canais de atendimento.</p>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -78,7 +78,7 @@ const FaleConosco: React.FC = () => {
             {}
             <button 
                 type="submit" 
-                className="w-full bg-hc-secundaria text-white font-bold py-3 rounded-lg shadow-md hover:bg-hc-principal transition duration-150 focus:outline-none focus:ring-4 focus:ring-hc-secundaria/50"
+                className="w-full bg-hc-secundaria text-gray-700 font-bold py-3 rounded-lg shadow-md hover:bg-hc-principal transition duration-150 focus:outline-none focus:ring-4 focus:ring-hc-secundaria/50"
             >
                 Enviar Mensagem
             </button>

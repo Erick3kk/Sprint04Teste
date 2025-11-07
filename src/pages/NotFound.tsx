@@ -12,7 +12,7 @@ const NotFound: React.FC = () => {
                 {}
                 <div className="text-[14rem] font-black mb-0 leading-none">
                     {}
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-hc-principal to-hc-secundaria">
+                    <span className="bg-clip-text text-gray-700 bg-gradient-to-r from-hc-principal to-hc-secundaria">
                         404
                     </span>
                 </div>

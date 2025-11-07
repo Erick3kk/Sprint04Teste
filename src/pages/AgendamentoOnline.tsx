@@ -23,13 +23,13 @@ const AgendamentoOnline: React.FC = () => {
             <div className="w-full max-w-xl bg-white p-8 rounded-2xl shadow-xl border border-gray-100"> 
                 
                 {}
-                <h1 className="text-3xl font-extrabold text-hc-principal mb-2 border-b pb-2">Solicitação de Agendamento</h1>
+                <h1 className="text-3xl font-extrabold text-hc-principal mb-2 border-b pb-2 text-gray-500 mb-8">Solicitação de Agendamento</h1>
                 <p className="text-gray-500 mb-8">Preencha os dados e entraremos em contato para confirmar a disponibilidade.</p>
 
                 <form onSubmit={handleSubmit(onSubmit)}> 
                     
                     {}
-                    <InputForm<AgendamentoInputs> 
+                    <InputForm 
                       label="Nome Completo"
                       name="nome"
                       register={register}
@@ -37,7 +37,7 @@ const AgendamentoOnline: React.FC = () => {
                       rules={{ required: "O nome é obrigatório." }}
                     />
 
-                    <InputForm<AgendamentoInputs> 
+                    <InputForm 
                       label="E-mail"
                       name="email"
                       type="email"
@@ -69,7 +69,7 @@ const AgendamentoOnline: React.FC = () => {
                          {errors.especialidade && <p className="text-red-500 text-sm mt-1">{String(errors.especialidade.message)}</p>}
                     </div>
 
-                    <InputForm<AgendamentoInputs> 
+                    <InputForm 
                       label="Data Desejada"
                       name="data"
                       type="date"

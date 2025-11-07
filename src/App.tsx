@@ -1,15 +1,19 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-router-dom';
 import { LayoutHC } from './components/layoutHC'; 
 
 import HomeHC from './pages/HomeHC'; 
 import AboutHC from './pages/AboutHC'; 
 import FaleConosco from './pages/FaleConosco'; 
-import AgendamentoOnline from './pages/agendamentoOnline'; 
+import AgendamentoOnline from './pages/AgendamentoOnline'; 
 import AcessoPaciente from './pages/AcessoPaciente'; 
 import IntegrantesHC from './pages/IntegrantesHC'; 
 import SuporteVirtual from './pages/SuporteVirtual'; 
 import NotFound from './pages/NotFound'; 
+import CadastroPaciente from './pages/CadastroPaciente';
+import ProtectedRoute from './components/ProtectedRoute';
+import DashboardPaciente from './pages/DashboardPaciente';
+import AgendamentoConsulta from './pages/AgendamentoConsulta';
 
 
 const AppHC: React.FC = () => (
@@ -27,7 +31,17 @@ const AppHC: React.FC = () => (
         <Route path="/agendamento" element={<AgendamentoOnline />} />
         <Route path="/fale-conosco" element={<FaleConosco />} />
         <Route path="/acesso-paciente" element={<AcessoPaciente />} />
-        
+        <Route path="/cadastro" element={<CadastroPaciente />} />
+        {/* PÁGINA PROTEGIDA */}
+        <Route
+          path="/dashboard-paciente"
+          element={
+            <ProtectedRoute>
+              <DashboardPaciente />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/agendamento-consulta" element={<AgendamentoConsulta />} />
         {}
         <Route path="/suporte-virtual" element={<SuporteVirtual />} /> {}
 
