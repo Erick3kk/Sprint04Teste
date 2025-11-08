@@ -19,7 +19,7 @@ export default function CadastroPaciente() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const API_BASE = 'http://localhost:8080';
+  const API_BASE = 'https://challengejavasprint04-1.onrender.com';
 
   const enderecoForm = useForm<EnderecoForm>({ defaultValues: { complemento: '' } });
   const pacienteForm = useForm<PacienteForm>({ defaultValues: { idEndereco: 0 } });

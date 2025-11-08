@@ -2,7 +2,7 @@
 import { LoginRequest, Paciente } from './types/login';
 import { Consulta, Receita } from './types/consulta';
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = 'https://challengejavasprint04-1.onrender.com';
 
 class ApiService {
   private readonly KEY = 'usuarioLogado';
