@@ -14,6 +14,8 @@ import CadastroPaciente from './pages/CadastroPaciente';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardPaciente from './pages/DashboardPaciente';
 import AgendamentoConsulta from './pages/AgendamentoConsulta';
+import EditarConsulta from './pages/EditarConsulta';
+import Receita from './pages/Receita';
 
 
 const AppHC: React.FC = () => (
@@ -32,7 +34,7 @@ const AppHC: React.FC = () => (
         <Route path="/fale-conosco" element={<FaleConosco />} />
         <Route path="/acesso-paciente" element={<AcessoPaciente />} />
         <Route path="/cadastro" element={<CadastroPaciente />} />
-        {/* PÁGINA PROTEGIDA */}
+        {}
         <Route
           path="/dashboard-paciente"
           element={
@@ -43,6 +45,10 @@ const AppHC: React.FC = () => (
         />
         <Route path="/agendamento-consulta" element={<AgendamentoConsulta />} />
         {}
+        <Route path="/editar-consulta" element={<EditarConsulta />} />
+        <Route path="/receita" element={<Receita/>} />
+
+
         <Route path="/suporte-virtual" element={<SuporteVirtual />} /> {}
 
         {}

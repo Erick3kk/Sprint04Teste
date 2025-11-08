@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Calendar, Clock, Stethoscope, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,7 +17,9 @@ export default function AgendamentoConsulta() {
   const [erro, setErro] = useState('');
   const navigate = useNavigate();
 
-  // PEGA ID DO PACIENTE LOGADO
+  const API_BASE = 'http://localhost:8080';
+
+  // === PEGA ID DO PACIENTE LOGADO ===
   const getPacienteId = (): number | null => {
     const user = localStorage.getItem('usuarioLogado');
     if (!user) return null;
@@ -32,23 +33,33 @@ export default function AgendamentoConsulta() {
 
   const idPaciente = getPacienteId();
 
-  // REDIRECIONA SE NÃO ESTIVER LOGADO
+  // Redireciona se não estiver logado
   useEffect(() => {
     if (idPaciente === null) {
       navigate('/acesso-paciente');
     }
   }, [idPaciente, navigate]);
 
-  // CARREGA MÉDICOS
+  // === CARREGA MÉDICOS COM fetch ===
   useEffect(() => {
     if (!idPaciente) return;
 
-    axios.get('http://localhost:8080/medicos/listar')
-      .then(res => setMedicos(res.data || []))
-      .catch(() => setErro('Erro ao carregar médicos'));
+    const carregarMedicos = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/medicos/listar`);
+        if (!res.ok) throw new Error('Erro ao carregar médicos');
+        const data = await res.json();
+        setMedicos(data || []);
+      } catch (err) {
+        setErro('Erro ao carregar médicos');
+        console.error(err);
+      }
+    };
+
+    carregarMedicos();
   }, [idPaciente]);
 
-  // AGENDAR CONSULTA
+  // === AGENDAR CONSULTA COM fetch ===
   const agendar = async () => {
     if (!medicoId || !data || !hora || !idPaciente) {
       setErro('Preencha todos os campos');
@@ -72,15 +83,21 @@ export default function AgendamentoConsulta() {
     };
 
     try {
-      await axios.post('http://localhost:8080/consultas/criar', payload, {
-        headers: { 'Content-Type': 'application/json' }
+      const res = await fetch(`${API_BASE}/consultas/criar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
+
+      if (!res.ok) {
+        const erroTexto = await res.text();
+        throw new Error(erroTexto || 'Erro ao agendar consulta');
+      }
 
       alert('Consulta agendada com sucesso!');
       navigate('/dashboard-paciente');
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Erro ao agendar consulta';
-      setErro(msg);
+      setErro(err.message || 'Erro ao agendar consulta');
     } finally {
       setLoading(false);
     }
@@ -151,7 +168,7 @@ export default function AgendamentoConsulta() {
             {/* HORÁRIO */}
             {data && (
               <div>
-                <label className="flex items-corner gap-2 text-sm font-semibold text-gray-700 mb-3">
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
                   <Clock className="w-5 h-5 text-blue-600" />
                   Horário
                 </label>

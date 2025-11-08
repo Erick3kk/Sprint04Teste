@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { InputForm } from '../components/InputForm';
-import { apiService } from '../services/api';
 import { Link, useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 
+// === SCHEMAS ZOD ===
 const enderecoSchema = z.object({
   logradouro: z.string().min(1, 'Logradouro é obrigatório'),
   numero: z.string().min(1, 'Número é obrigatório'),
@@ -14,9 +14,7 @@ const enderecoSchema = z.object({
   bairro: z.string().min(1, 'Bairro é obrigatório'),
   cidade: z.string().min(1, 'Cidade é obrigatória'),
   estado: z.string().length(2, 'Estado: 2 letras'),
-  cep: z.string()
-    .regex(/^\d{8}$/, 'CEP: 8 dígitos (ex: 06083260)')
-    .min(8, 'CEP deve ter 8 dígitos'),
+  cep: z.string().regex(/^\d{8}$/, 'CEP: 8 dígitos (ex: 06083260)'),
 });
 
 const pacienteSchema = z.object({
@@ -25,6 +23,7 @@ const pacienteSchema = z.object({
   dataNascimento: z.string().min(1, 'Data é obrigatória'),
   telefone: z.string().min(10, 'Telefone inválido'),
   email: z.string().email('E-mail inválido'),
+  idEndereco: z.number().int().positive('Endereço inválido'), // ← VALIDADO
 });
 
 type EnderecoForm = z.infer<typeof enderecoSchema>;
@@ -37,6 +36,8 @@ export default function CadastroPaciente() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const API_BASE = 'http://localhost:8080';
+
   const enderecoForm = useForm<EnderecoForm>({
     resolver: zodResolver(enderecoSchema),
     defaultValues: { complemento: '' },
@@ -44,77 +45,104 @@ export default function CadastroPaciente() {
 
   const pacienteForm = useForm<PacienteForm>({
     resolver: zodResolver(pacienteSchema),
+    defaultValues: { idEndereco: 0 }, // ← Inicializa com 0
   });
 
+  // === SALVAR ENDEREÇO ===
   const onEnderecoSubmit = async (data: EnderecoForm) => {
-  setLoading(true);
-  setError('');
-  try {
+    setLoading(true);
+    setError('');
+
     const payload = {
-  logradouro: data.logradouro.trim(),
-  numero: parseInt(data.numero, 10), // ← GARANTE NÚMERO
-  complemento: data.complemento?.trim() || null,
-  bairro: data.bairro.trim(),
-  cidade: data.cidade.trim(),
-  estado: data.estado.toUpperCase().trim(),
-  cep: data.cep.replace(/\D/g, '').trim(), // ← 8 DÍGITOS
-};
+      logradouro: data.logradouro.trim(),
+      numero: data.numero.trim(),
+      complemento: data.complemento?.trim() || null,
+      bairro: data.bairro.trim(),
+      cidade: data.cidade.trim(),
+      estado: data.estado.toUpperCase().trim(),
+      cep: data.cep.replace(/\D/g, ''),
+    };
 
     console.log('ENVIANDO ENDEREÇO:', payload);
 
-    const res = await apiService.cadastrarEndereco(payload);
-    console.log('ENDEREÇO CADASTRADO:', res);
+    try {
+      const res = await fetch(`${API_BASE}/enderecos/criar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    setIdEndereco(res.idEndereco);
-    setStep('paciente');
-  } catch (err: any) {
-    const msg = err.response?.data?.message || 'Erro ao salvar endereço';
-    setError(msg);
-  } finally {
-    setLoading(false);
-  }
-};
+      if (!res.ok) {
+        const erro = await res.text();
+        throw new Error(erro || 'Erro ao salvar endereço');
+      }
 
-const onPacienteSubmit = async (data: PacienteForm) => {
-  console.log('BOTÃO FINALIZAR CLICADO'); // DEBUG
-  console.log('idEndereco atual:', idEndereco); // VERIFICA SE TEM ID
+      const resultado = await res.json();
+      const idRecebido = resultado.idEndereco;
 
-  if (!idEndereco) {
-    setError('Erro: Endereço não foi salvo. Tente novamente.');
-    return;
-  }
+      if (!idRecebido || typeof idRecebido !== 'number') {
+        throw new Error('ID do endereço inválido');
+      }
 
-  setLoading(true);
-  setError('');
+      console.log('ENDEREÇO SALVO! ID:', idRecebido);
 
-  try {
-    const [dia, mes, ano] = data.dataNascimento.split('/');
-    const dataFormatada = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+      // SALVA NO ESTADO E NO FORMULÁRIO
+      setIdEndereco(idRecebido);
+      pacienteForm.setValue('idEndereco', idRecebido); // ← AQUI É OBRIGATÓRIO!
+
+      setStep('paciente');
+    } catch (err: any) {
+      console.error('ERRO:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // === SALVAR PACIENTE ===
+  const onPacienteSubmit = async (data: PacienteForm) => {
+    console.log('DADOS COMPLETOS DO PACIENTE:', data); // ← idEndereco incluso!
+
+    if (!data.idEndereco || data.idEndereco <= 0) {
+      setError('Erro: Endereço não foi vinculado corretamente.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
 
     const payload = {
       nome: data.nome.trim(),
       cpf: data.cpf.replace(/\D/g, ''),
-      dataNascimento: dataFormatada,
+      dataNascimento: data.dataNascimento,
       telefone: data.telefone.replace(/\D/g, ''),
       email: data.email.toLowerCase().trim(),
-      endereco: { idEndereco },
+      idEndereco: data.idEndereco
     };
 
-    console.log('ENVIANDO PACIENTE PARA API:', payload);
+    console.log('ENVIANDO PACIENTE:', payload);
 
-    const response = await apiService.cadastrarPaciente(payload);
-    console.log('PACIENTE CADASTRADO:', response);
+    try {
+      const res = await fetch(`${API_BASE}/pacientes/criar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    alert('Paciente cadastrado com sucesso!');
-    navigate('/acesso-paciente');
-  } catch (err: any) {
-    console.error('ERRO NO CADASTRO DO PACIENTE:', err);
-    const msg = err.response?.data?.message || err.message || 'Erro ao cadastrar paciente';
-    setError(`Erro: ${msg}`);
-  } finally {
-    setLoading(false);
-  }
-};
+      if (!res.ok) {
+        const erro = await res.text();
+        throw new Error(erro || 'Erro ao cadastrar paciente');
+      }
+
+      alert('Cadastro concluído com sucesso!');
+      navigate('/acesso-paciente');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-2xl">
@@ -139,6 +167,7 @@ const onPacienteSubmit = async (data: PacienteForm) => {
           </div>
         </div>
 
+        {/* === ETAPA 1: ENDEREÇO === */}
         {step === 'endereco' && (
           <form onSubmit={enderecoForm.handleSubmit(onEnderecoSubmit)} className="space-y-5 text-gray-600">
             <InputForm label="Logradouro" name="logradouro" register={enderecoForm.register} errors={enderecoForm.formState.errors} />
@@ -159,8 +188,23 @@ const onPacienteSubmit = async (data: PacienteForm) => {
           </form>
         )}
 
+        {/* === ETAPA 2: PACIENTE === */}
         {step === 'paciente' && (
           <form onSubmit={pacienteForm.handleSubmit(onPacienteSubmit)} className="space-y-5 text-gray-600">
+            
+            {/* CAMPO HIDDEN: ID DO ENDEREÇO */}
+            <input
+              type="hidden"
+              {...pacienteForm.register('idEndereco', { valueAsNumber: true })}
+            />
+
+            {/* DEBUG VISUAL (REMOVA DEPOIS) */}
+            {idEndereco && (
+              <div className="bg-green-50 border border-green-200 text-green-700 p-3 rounded-lg text-sm mb-4">
+                Endereço vinculado: ID <strong>{idEndereco}</strong>
+              </div>
+            )}
+
             <InputForm label="Nome Completo" name="nome" register={pacienteForm.register} errors={pacienteForm.formState.errors} />
             <InputForm label="CPF (11 dígitos)" name="cpf" register={pacienteForm.register} errors={pacienteForm.formState.errors} placeholder="12345678910" />
             <InputForm label="Data de Nascimento" name="dataNascimento" type="date" register={pacienteForm.register} errors={pacienteForm.formState.errors} />

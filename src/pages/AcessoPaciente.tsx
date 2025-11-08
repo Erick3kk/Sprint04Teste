@@ -1,6 +1,15 @@
+// src/pages/AcessoPaciente.tsx
 import { useState } from 'react';
-import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import { apiService } from '../services/apiService';
+
+const formatarCPF = (v: string) =>
+  v.replace(/\D/g, '')
+   .replace(/(\d{3})(\d)/, '$1.$2')
+   .replace(/(\d{3})(\d)/, '$1.$2')
+   .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+   .replace(/(-\d{2})\d+?$/, '$1')
+   .slice(0, 14);
 
 export default function AcessoPaciente() {
   const [cpf, setCpf] = useState('');
@@ -9,55 +18,19 @@ export default function AcessoPaciente() {
   const [erro, setErro] = useState('');
   const navigate = useNavigate();
 
-  // FORMATA CPF AUTOMATICAMENTE
-  const formatarCPF = (valor: string) => {
-    return valor
-      .replace(/\D/g, '')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
-      .replace(/(-\d{2})\d+?$/, '$1');
-  };
-
-  const fazerLogin = async () => {
-    if (!cpf || !email) {
-      setErro('Preencha CPF e Email');
-      return;
-    }
+  const login = async () => {
+    const cpfLimpo = cpf.replace(/\D/g, '');
+    if (cpfLimpo.length !== 11) return setErro('CPF deve ter 11 dígitos');
+    if (!email.includes('@')) return setErro('Email inválido');
 
     setLoading(true);
     setErro('');
 
-    const cpfLimpo = cpf.replace(/\D/g, '');
-
     try {
-      // ENVIA CPF + EMAIL PARA O BACKEND
-      const res = await axios.post('http://localhost:8080/login', {
-        cpf: cpfLimpo,
-        email: email.trim().toLowerCase()
-      });
-
-      const usuario = res.data;
-
-      if (!usuario?.idPaciente) {
-        setErro('Paciente não encontrado');
-        setLoading(false);
-        return;
-      }
-
-      // SALVA NO LOCALSTORAGE
-      localStorage.setItem('usuarioLogado', JSON.stringify({
-        idPaciente: usuario.idPaciente,
-        nome: usuario.nome || 'Paciente',
-        cpf: usuario.cpf,
-        email: usuario.email
-      }));
-
-      alert(`Bem-vindo, ${usuario.nome || 'Paciente'}!`);
+      await apiService.login({ cpf: cpfLimpo, email: email.trim().toLowerCase() });
       navigate('/dashboard-paciente');
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'CPF ou Email incorretos';
-      setErro(msg);
+      setErro(err.message); // AGORA MOSTRA MENSAGEM CLARA
     } finally {
       setLoading(false);
     }
@@ -77,50 +50,43 @@ export default function AcessoPaciente() {
           </div>
         )}
 
-        <div className="space-y-6">
-          {/* CPF */}
+        <div className="space-y-6 text-gray-600">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              CPF
-            </label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">CPF</label>
             <input
               type="text"
               placeholder="000.000.000-00"
               value={cpf}
               onChange={(e) => setCpf(formatarCPF(e.target.value))}
               maxLength={14}
-              className="w-full p-4 border border-gray-300 rounded-xl text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          {/* EMAIL */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Email
-            </label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
             <input
               type="email"
               placeholder="seu@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-xl text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          {/* BOTÃO */}
           <button
-            onClick={fazerLogin}
+            onClick={login}
             disabled={loading}
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-70 transition shadow-lg"
           >
             {loading ? 'Entrando...' : 'Acessar Portal'}
           </button>
         </div>
-        
+
         <div className="flex justify-center my-12">
           <Link
             to="/cadastro"
-            className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-12 py-5 rounded-xl font-bold text-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-xl transform hover:scale-105 active:scale-95"
+            className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-12 py-5 rounded-xl font-bold text-xl hover:from-green-700 hover:to-emerald-700 transition-all shadow-xl"
           >
             Cadastre-se
           </Link>

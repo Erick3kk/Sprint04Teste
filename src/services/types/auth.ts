@@ -4,6 +4,7 @@ export interface LoginCpfRequest {
 }
 
 export interface LoginResponse {
+  idPaciente: any;
   token: string;
   usuario: {
     id: number;

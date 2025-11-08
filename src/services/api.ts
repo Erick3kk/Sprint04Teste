@@ -1,54 +1,32 @@
-// src/services/api.ts
-import axios from 'axios';
-import { Paciente } from '../services/types/login';
-import { Consulta, Receita, Medico } from '../services/types/consulta';
+// src/services/apiService.ts
+import { LoginRequest, Paciente } from './types/login';
+import { Consulta, Receita } from './types/consulta';
 
-const api = axios.create({
-  baseURL: 'http://localhost:8080',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+const API_BASE = 'http://localhost:8080';
 
 class ApiService {
+  private readonly KEY = 'usuarioLogado';
+
   // === LOGIN ===
-  public async login(dados: { email: string; cpf: string }): Promise<Paciente> {
-    const res = await api.post<Paciente>('/login', dados);
-    const paciente = res.data;
-    localStorage.setItem('paciente', JSON.stringify(paciente));
+  public async login(dados: LoginRequest): Promise<Paciente> {
+    const res = await fetch(`${API_BASE}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados),
+    });
+
+    if (!res.ok) {
+      const erro = await res.text();
+      throw new Error(erro || 'Erro no login');
+    }
+
+    const paciente: Paciente = await res.json();
+    localStorage.setItem(this.KEY, JSON.stringify(paciente));
     return paciente;
   }
 
-  // === CADASTRO ===
-  public async cadastrarEndereco(dados: {
-    logradouro: string;
-    numero: number;
-    complemento: string | null;
-    bairro: string;
-    cidade: string;
-    estado: string;
-    cep: string;
-  }): Promise<{ idEndereco: number }> {
-    const res = await api.post('/enderecos/criar', dados);
-    return res.data;
-  }
-
-  public async cadastrarPaciente(dados: {
-    nome: string;
-    cpf: string;
-    dataNascimento: string;
-    telefone: string;
-    email: string;
-    endereco: { idEndereco: number };
-  }): Promise<Paciente> {
-    const res = await api.post<Paciente>('/pacientes', dados);
-    return res.data;
-  }
-
-  // === DADOS DO USUÁRIO LOGADO ===
   public getPacienteLogado(): Paciente | null {
-    const data = localStorage.getItem('paciente');
+    const data = localStorage.getItem(this.KEY);
     return data ? JSON.parse(data) : null;
   }
 
@@ -57,27 +35,64 @@ class ApiService {
   }
 
   public logout(): void {
-    localStorage.removeItem('paciente');
+    localStorage.removeItem(this.KEY);
   }
 
   // === CONSULTAS ===
-  public async getConsultas(idPaciente: number): Promise<Consulta[]> {
-    const res = await api.get<Consulta[]>('/consultas/listar');
-    return res.data;
+  public async getConsultasDoPaciente(idPaciente: number): Promise<Consulta[]> {
+    const res = await fetch(`${API_BASE}/consultas/consultaPaciente/${idPaciente}`);
+    if (!res.ok) throw new Error('Erro ao carregar consultas');
+    return await res.json();
   }
 
-  // === MÉDICOS ===
-  public async getMedicos(): Promise<Medico[]> {
-    const res = await api.get<Medico[]>('/medicos/listar');
-    return res.data;
+  public async getConsulta(idConsulta: number): Promise<Consulta> {
+    const user = this.getPacienteLogado();
+    if (!user) throw new Error('Usuário não logado');
+
+    const consultas = await this.getConsultasDoPaciente(user.idPaciente);
+    const consulta = consultas.find(c => c.idConsulta === idConsulta);
+    if (!consulta) throw new Error('Consulta não encontrada');
+    return consulta;
+  }
+
+  public async atualizarConsulta(dados: { idConsulta: number; status: string }): Promise<void> {
+    const res = await fetch(`${API_BASE}/consultas/atualizar`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados),
+    });
+
+    if (!res.ok) {
+      const erro = await res.text();
+      throw new Error(erro || 'Erro ao atualizar consulta');
+    }
   }
 
   // === RECEITAS ===
-  public async getReceitas(): Promise<Receita[]> {
-    const res = await api.get<Receita[]>('/receitas/listar');
-    return res.data;
+  public async criarReceita(dados: {
+    idConsulta: number;
+    medicamento: string;
+    dosagem: string;
+  }): Promise<Receita> {
+    const res = await fetch(`${API_BASE}/receitas/criar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados),
+    });
+
+    if (!res.ok) {
+      const erro = await res.text();
+      throw new Error(erro || 'Erro ao criar receita');
+    }
+
+    return await res.json();
+  }
+
+  public async getReceitasDaConsulta(idConsulta: number): Promise<Receita[]> {
+    const res = await fetch(`${API_BASE}/receitas/receitaConsulta/${idConsulta}`);
+    if (!res.ok) return []; // Silencioso se não tiver
+    return await res.json();
   }
 }
 
-// EXPORTA A INSTÂNCIA ÚNICA
 export const apiService = new ApiService();
