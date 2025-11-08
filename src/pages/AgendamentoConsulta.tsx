@@ -1,12 +1,10 @@
+// src/pages/AgendamentoConsulta.tsx
 import { useState, useEffect } from 'react';
-import { Calendar, Clock, Stethoscope, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-interface Medico {
-  idMedico: number;
-  nome: string;
-  especialidade: string;
-}
+import { apiService } from '../services/apiService';
+import { IconArrowLeft, IconCalendar, IconClock, IconStethoscope } from '../components/Icons';
+import type { Medico, AgendamentoPayload } from '../services/types/agendamento';
+import { validarAgendamento } from '../schemas/agendamentoSchema';
 
 export default function AgendamentoConsulta() {
   const [medicos, setMedicos] = useState<Medico[]>([]);
@@ -14,90 +12,69 @@ export default function AgendamentoConsulta() {
   const [data, setData] = useState('');
   const [hora, setHora] = useState('');
   const [loading, setLoading] = useState(false);
+  const [carregandoMedicos, setCarregandoMedicos] = useState(true);
   const [erro, setErro] = useState('');
   const navigate = useNavigate();
 
-  const API_BASE = 'http://localhost:8080';
+  const idPaciente = apiService.getPacienteId();
 
-  // === PEGA ID DO PACIENTE LOGADO ===
-  const getPacienteId = (): number | null => {
-    const user = localStorage.getItem('usuarioLogado');
-    if (!user) return null;
-    try {
-      const parsed = JSON.parse(user);
-      return parsed.idPaciente || null;
-    } catch {
-      return null;
-    }
-  };
-
-  const idPaciente = getPacienteId();
-
-  // Redireciona se não estiver logado
   useEffect(() => {
     if (idPaciente === null) {
       navigate('/acesso-paciente');
     }
   }, [idPaciente, navigate]);
 
-  // === CARREGA MÉDICOS COM fetch ===
+  // === CARREGA MÉDICOS ===
   useEffect(() => {
     if (!idPaciente) return;
 
-    const carregarMedicos = async () => {
+    const carregar = async () => {
+      setCarregandoMedicos(true);
+      setErro('');
       try {
-        const res = await fetch(`${API_BASE}/medicos/listar`);
-        if (!res.ok) throw new Error('Erro ao carregar médicos');
-        const data = await res.json();
-        setMedicos(data || []);
-      } catch (err) {
-        setErro('Erro ao carregar médicos');
-        console.error(err);
+        const lista = await apiService.getMedicos();
+        setMedicos(lista);
+      } catch (err: any) {
+        setErro(err.message || 'Não foi possível carregar os médicos');
+      } finally {
+        setCarregandoMedicos(false);
       }
     };
 
-    carregarMedicos();
+    carregar();
   }, [idPaciente]);
 
-  // === AGENDAR CONSULTA COM fetch ===
+  // === AGENDAR ===
   const agendar = async () => {
-    if (!medicoId || !data || !hora || !idPaciente) {
+    if (!idPaciente || !medicoId || !data || !hora) {
       setErro('Preencha todos os campos');
+      return;
+    }
+
+    const medico = medicos.find(m => m.idMedico === medicoId);
+    const payload: AgendamentoPayload = {
+      dataHora: `${data}T${hora}:00.000`,
+      status: 'AGENDADA',
+      areaMedica: medico?.especialidade || 'Não informada',
+      idPaciente,
+      idMedico: medicoId,
+    };
+
+    const erroValidacao = validarAgendamento(payload);
+    if (erroValidacao) {
+      setErro(erroValidacao);
       return;
     }
 
     setLoading(true);
     setErro('');
 
-    const medicoSelecionado = medicos.find(m => m.idMedico === medicoId);
-    const areaMedica = medicoSelecionado?.especialidade || 'Não informada';
-
-    const dataHoraString = `${data}T${hora}:00.000`;
-
-    const payload = {
-      dataHora: dataHoraString,
-      status: "AGENDADA",
-      areaMedica: areaMedica,
-      idPaciente: idPaciente,
-      idMedico: medicoId
-    };
-
     try {
-      const res = await fetch(`${API_BASE}/consultas/criar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const erroTexto = await res.text();
-        throw new Error(erroTexto || 'Erro ao agendar consulta');
-      }
-
+      await apiService.criarConsulta(payload);
       alert('Consulta agendada com sucesso!');
       navigate('/dashboard-paciente');
     } catch (err: any) {
-      setErro(err.message || 'Erro ao agendar consulta');
+      setErro(err.message || 'Erro ao agendar');
     } finally {
       setLoading(false);
     }
@@ -110,9 +87,10 @@ export default function AgendamentoConsulta() {
       <div className="max-w-2xl mx-auto">
         <button
           onClick={() => navigate('/dashboard-paciente')}
-          className="mb-6 text-blue-700 hover:text-blue-900 flex items-center gap-2 font-medium"
+          className="mb-6 text-blue-700 hover:text-blue-900 flex items-center gap-2 font-medium transition-colors"
         >
-          <ArrowLeft className="w-5 h-5" /> Voltar ao Dashboard
+          <IconArrowLeft />
+          Voltar ao Dashboard
         </button>
 
         <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
@@ -131,28 +109,39 @@ export default function AgendamentoConsulta() {
             {/* MÉDICO */}
             <div>
               <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
-                <Stethoscope className="w-5 h-5 text-blue-600" />
+                <IconStethoscope className="w-5 h-5 text-blue-600" />
                 Médico
               </label>
-              <select
-                value={medicoId || ''}
-                onChange={(e) => setMedicoId(Number(e.target.value))}
-                className="w-full p-4 border border-gray-300 rounded-xl text-gray-700 focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Selecione um médico</option>
-                {medicos.map(m => (
-                  <option key={m.idMedico} value={m.idMedico}>
-                    {m.nome} - {m.especialidade}
-                  </option>
-                ))}
-              </select>
+
+              {carregandoMedicos ? (
+                <div className="w-full p-4 border border-gray-300 rounded-xl text-gray-500 text-center">
+                  Carregando médicos...
+                </div>
+              ) : medicos.length === 0 ? (
+                <div className="w-full p-4 border border-gray-300 rounded-xl text-gray-500 text-center">
+                  Nenhum médico disponível
+                </div>
+              ) : (
+                <select
+                  value={medicoId || ''}
+                  onChange={(e) => setMedicoId(Number(e.target.value))}
+                  className="w-full p-4 border border-gray-300 rounded-xl text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                >
+                  <option value="">Selecione um médico</option>
+                  {medicos.map(m => (
+                    <option key={m.idMedico} value={m.idMedico}>
+                      {m.nome} - {m.especialidade}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             {/* DATA */}
             {medicoId && (
               <div>
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
-                  <Calendar className="w-5 h-5 text-blue-600" />
+                  <IconCalendar className="w-5 h-5 text-blue-600" />
                   Data
                 </label>
                 <input
@@ -160,7 +149,7 @@ export default function AgendamentoConsulta() {
                   min={new Date().toISOString().split('T')[0]}
                   value={data}
                   onChange={(e) => setData(e.target.value)}
-                  className="w-full p-4 border border-gray-300 rounded-xl text-gray-700 focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-4 border border-gray-300 rounded-xl text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
                 />
               </div>
             )}
@@ -169,13 +158,14 @@ export default function AgendamentoConsulta() {
             {data && (
               <div>
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
-                  <Clock className="w-5 h-5 text-blue-600" />
+                  <IconClock className="w-5 h-5 text-blue-600" />
                   Horário
                 </label>
                 <div className="grid grid-cols-3 gap-3">
                   {['08:00', '09:00', '10:00', '14:00', '15:00', '16:00'].map(h => (
                     <button
                       key={h}
+                      type="button"
                       onClick={() => setHora(h)}
                       className={`p-3 rounded-xl font-medium text-sm transition-all ${
                         hora === h
@@ -190,7 +180,6 @@ export default function AgendamentoConsulta() {
               </div>
             )}
 
-            {/* CONFIRMAR */}
             <button
               onClick={agendar}
               disabled={loading || !medicoId || !data || !hora}

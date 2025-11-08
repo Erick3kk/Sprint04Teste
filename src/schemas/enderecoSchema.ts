@@ -1,19 +1,11 @@
-import * as z from 'zod';
+import type { EnderecoForm } from '../services/types/endereco';
 
-export const enderecoSchema = z.object({
-  DS_LOGRADOURO: z.string().min(3, 'Logradouro é obrigatório'),
-  NR_NUMERO: z.string().min(1, 'Número é obrigatório'),
-  DS_COMPLEMENTO: z.string().optional().nullable(),
-  NM_BAIRRO: z.string().min(2, 'Bairro é obrigatório'),
-  NM_CIDADE: z.string().min(2, 'Cidade é obrigatória'),
-  SG_ESTADO: z
-    .string()
-    .length(2, 'Estado deve ter 2 letras (ex: SP)')
-    .toUpperCase(),
-  NR_CEP: z
-    .string()
-    .regex(/^\d{5}-?\d{3}$/, 'CEP inválido (use 00000-000)')
-    .transform((val) => val.replace(/\D/g, '')),
-});
-
-export type EnderecoForm = z.infer<typeof enderecoSchema>;
+export const validarEndereco = (data: EnderecoForm): string | null => {
+  if (!data.logradouro?.trim()) return 'Logradouro é obrigatório';
+  if (!data.numero?.trim()) return 'Número é obrigatório';
+  if (!data.bairro?.trim()) return 'Bairro é obrigatório';
+  if (!data.cidade?.trim()) return 'Cidade é obrigatória';
+  if (!data.estado?.trim() || data.estado.trim().length !== 2) return 'Estado: 2 letras';
+  if (!/^\d{8}$/.test(data.cep.replace(/\D/g, ''))) return 'CEP: 8 dígitos';
+  return null;
+};

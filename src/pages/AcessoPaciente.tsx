@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { apiService } from '../services/apiService';
 
-const formatarCPF = (v: string) =>
+import { validarLogin } from '../schemas/loginSchema';
+
+const formatarCPF = (v: string): string =>
   v.replace(/\D/g, '')
    .replace(/(\d{3})(\d)/, '$1.$2')
    .replace(/(\d{3})(\d)/, '$1.$2')
@@ -20,17 +22,24 @@ export default function AcessoPaciente() {
 
   const login = async () => {
     const cpfLimpo = cpf.replace(/\D/g, '');
-    if (cpfLimpo.length !== 11) return setErro('CPF deve ter 11 dígitos');
-    if (!email.includes('@')) return setErro('Email inválido');
+    const emailLimpo = email.trim().toLowerCase();
+
+    const dadosLogin = { cpf: cpfLimpo, email: emailLimpo };
+    const erroValidacao = validarLogin(dadosLogin);
+
+    if (erroValidacao) {
+      setErro(erroValidacao);
+      return;
+    }
 
     setLoading(true);
     setErro('');
 
     try {
-      await apiService.login({ cpf: cpfLimpo, email: email.trim().toLowerCase() });
+      await apiService.login(dadosLogin);
       navigate('/dashboard-paciente');
     } catch (err: any) {
-      setErro(err.message); // AGORA MOSTRA MENSAGEM CLARA
+      setErro(err.message || 'Erro ao fazer login. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -59,7 +68,7 @@ export default function AcessoPaciente() {
               value={cpf}
               onChange={(e) => setCpf(formatarCPF(e.target.value))}
               maxLength={14}
-              className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500"
+              className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
             />
           </div>
 
@@ -70,14 +79,14 @@ export default function AcessoPaciente() {
               placeholder="seu@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500"
+              className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
             />
           </div>
 
           <button
             onClick={login}
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-70 transition shadow-lg"
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-70 transition-all shadow-lg"
           >
             {loading ? 'Entrando...' : 'Acessar Portal'}
           </button>

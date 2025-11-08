@@ -1,9 +1,11 @@
 // src/pages/Receita.tsx
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Pill, Calendar, User } from 'lucide-react';
 import { apiService } from '../services/apiService';
-import { Receita } from '../services/types/receita'; // IMPORTA A INTERFACE
+import { Receita } from '../services/types/receita';
+
+// === ÍCONES CENTRALIZADOS (SEM LUCIDE) ===
+import { IconArrowLeft, IconPill, IconCalendar, IconUser } from '../components/Icons';
 
 export default function ReceitaPage() {
   const [searchParams] = useSearchParams();
@@ -14,35 +16,35 @@ export default function ReceitaPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-  if (!idConsulta) {
-    setErro('Consulta não informada');
-    setLoading(false);
-    return;
-  }
-
-  const carregarReceitas = async () => {
-    try {
-      const data = await apiService.getReceitasDaConsulta(idConsulta);
-      setReceitas(data);
-    } catch (err) {
-      let mensagem = 'Receita não encontrada';
-
-      if (err instanceof Error) {
-        mensagem = err.message;
-      } else if (typeof err === 'string') {
-        mensagem = err;
-      } else {
-        console.error('Erro inesperado:', err);
-      }
-
-      setErro(mensagem);
-    } finally {
+    if (!idConsulta) {
+      setErro('Consulta não informada');
       setLoading(false);
+      return;
     }
-  };
 
-  carregarReceitas();
-}, [idConsulta]);
+    const carregarReceitas = async () => {
+      try {
+        const data = await apiService.getReceitasDaConsulta(idConsulta);
+        setReceitas(data);
+      } catch (err) {
+        let mensagem = 'Receita não encontrada';
+
+        if (err instanceof Error) {
+          mensagem = err.message;
+        } else if (typeof err === 'string') {
+          mensagem = err;
+        } else {
+          console.error('Erro inesperado:', err);
+        }
+
+        setErro(mensagem);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarReceitas();
+  }, [idConsulta]);
 
   const formatarData = (data: string) =>
     new Date(data).toLocaleDateString('pt-BR', {
@@ -51,6 +53,7 @@ export default function ReceitaPage() {
       year: 'numeric',
     });
 
+  // === ESTADO: CARREGANDO ===
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -59,6 +62,7 @@ export default function ReceitaPage() {
     );
   }
 
+  // === ESTADO: ERRO ===
   if (erro) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
@@ -66,7 +70,7 @@ export default function ReceitaPage() {
           <p className="text-red-600 font-bold mb-4">{erro}</p>
           <button
             onClick={() => navigate('/dashboard-paciente')}
-            className="text-blue-600 hover:underline"
+            className="text-blue-600 hover:underline font-medium"
           >
             Voltar ao Dashboard
           </button>
@@ -75,15 +79,16 @@ export default function ReceitaPage() {
     );
   }
 
+  // === ESTADO: SEM RECEITA ===
   if (receitas.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
         <div className="bg-white rounded-3xl shadow-xl p-8 text-center max-w-md">
-          <Pill className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <IconPill className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <p className="text-xl text-gray-600">Nenhuma receita encontrada para esta consulta.</p>
           <button
             onClick={() => navigate('/dashboard-paciente')}
-            className="mt-6 text-blue-600 hover:underline"
+            className="mt-6 text-blue-600 hover:underline font-medium"
           >
             Voltar
           </button>
@@ -92,14 +97,16 @@ export default function ReceitaPage() {
     );
   }
 
+  // === ESTADO: SUCESSO ===
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-6">
       <div className="max-w-3xl mx-auto">
+        {/* BOTÃO VOLTAR */}
         <button
           onClick={() => navigate('/dashboard-paciente')}
-          className="mb-6 text-emerald-700 hover:text-emerald-900 flex items-center gap-2 font-medium"
+          className="mb-6 text-emerald-700 hover:text-emerald-900 flex items-center gap-2 font-medium transition-colors"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <IconArrowLeft />
           Voltar ao Dashboard
         </button>
 
@@ -109,9 +116,10 @@ export default function ReceitaPage() {
               key={receita.idReceita}
               className="bg-white rounded-3xl shadow-2xl p-8 border-2 border-green-200"
             >
+              {/* TÍTULO + ID */}
               <div className="flex items-center justify-between mb-6">
                 <h1 className="text-3xl font-bold text-green-800 flex items-center gap-3">
-                  <Pill className="w-8 h-8" />
+                  <IconPill className="w-8 h-8" />
                   Receita Médica
                 </h1>
                 <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-bold">
@@ -119,6 +127,7 @@ export default function ReceitaPage() {
                 </span>
               </div>
 
+              {/* INFORMAÇÕES DA CONSULTA */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 bg-green-50 rounded-2xl">
                 <div>
                   <p className="text-sm text-green-700 font-semibold">Consulta</p>
@@ -127,14 +136,14 @@ export default function ReceitaPage() {
                 <div>
                   <p className="text-sm text-green-700 font-semibold">Data</p>
                   <p className="font-bold text-gray-800 flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
+                    <IconCalendar className="w-4 h-4" />
                     {formatarData(receita.consulta.dataHora)}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-green-700 font-semibold">Médico</p>
                   <p className="font-bold text-gray-800 flex items-center gap-2">
-                    <User className="w-4 h-4" />
+                    <IconUser className="w-4 h-4" />
                     Dr(a). {receita.consulta.medico.nome}
                   </p>
                 </div>
@@ -144,6 +153,7 @@ export default function ReceitaPage() {
                 </div>
               </div>
 
+              {/* PRESCRIÇÃO */}
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl border border-green-300">
                 <h2 className="text-xl font-bold text-green-800 mb-4">Prescrição</h2>
                 <div className="space-y-3">
@@ -158,6 +168,7 @@ export default function ReceitaPage() {
                 </div>
               </div>
 
+              {/* RODAPÉ */}
               <div className="mt-8 text-center text-sm text-gray-500">
                 <p>Esta receita é válida por 30 dias a partir da data da consulta.</p>
                 <p className="mt-1">Emitida pelo sistema Hospital Clínicas</p>

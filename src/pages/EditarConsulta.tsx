@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { apiService } from '../services/apiService';
 import { Consulta } from '../services/types/consulta';
-import { CheckCircle2, Pill } from 'lucide-react';
+
+// === ÍCONES CENTRALIZADOS (SEM LUCIDE) ===
+import { IconCheckCircle, IconPill } from '../components/Icons';
 
 export default function EditarConsulta() {
   const [searchParams] = useSearchParams();
@@ -12,7 +14,7 @@ export default function EditarConsulta() {
   const [status, setStatus] = useState<string>('');
   const [medicamento, setMedicamento] = useState('');
   const [dosagem, setDosagem] = useState('');
-  const [loading, setLoading] = useState(true); // ← COMEÇA COM TRUE
+  const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
   const navigate = useNavigate();
 
@@ -34,55 +36,55 @@ export default function EditarConsulta() {
     };
 
     if (idConsulta) carregar();
-  }, [idConsulta]); // ← SEM navigate
+  }, [idConsulta]);
 
-    const salvar = async () => {
-  if (!consulta) return;
-  setLoading(true);
-  setErro('');
+  const salvar = async () => {
+    if (!consulta) return;
+    setLoading(true);
+    setErro('');
 
-  try {
-    // 1. ATUALIZA CONSULTA
-    await apiService.atualizarConsulta({
-      idConsulta: consulta.idConsulta,
-      status: status,
-    });
-
-    // 2. CRIA RECEITA SE FOR REALIZADA
-    if (status === 'REALIZADA' && medicamento.trim() && dosagem.trim()) {
-      await apiService.criarReceita({
+    try {
+      // 1. ATUALIZA CONSULTA
+      await apiService.atualizarConsulta({
         idConsulta: consulta.idConsulta,
-        medicamento: medicamento.trim(),
-        dosagem: dosagem.trim(),
+        status: status,
       });
+
+      // 2. CRIA RECEITA SE FOR REALIZADA
+      if (status === 'REALIZADA' && medicamento.trim() && dosagem.trim()) {
+        await apiService.criarReceita({
+          idConsulta: consulta.idConsulta,
+          medicamento: medicamento.trim(),
+          dosagem: dosagem.trim(),
+        });
+      }
+
+      navigate('/dashboard-paciente');
+    } catch (err: any) {
+      setErro(err.message || 'Erro ao salvar');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    navigate('/dashboard-paciente');
-  } catch (err: any) {
-    setErro(err.message || 'Erro ao salvar');
-  } finally {
-    setLoading(false);
-  }
-};
-
-  // LOADING
+  // === ESTADO: CARREGANDO ===
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <p className="text-lg">Carregando consulta...</p>
+        <p className="text-lg text-gray-700">Carregando consulta...</p>
       </div>
     );
   }
 
-  // ERRO
+  // === ESTADO: ERRO ===
   if (erro && !consulta) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
-        <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
-          <p className="text-red-600 font-bold">{erro}</p>
+        <div className="bg-white rounded-3xl shadow-xl p-8 text-center max-w-md">
+          <p className="text-red-600 font-bold mb-4">{erro}</p>
           <button
             onClick={() => navigate('/dashboard-paciente')}
-            className="mt-4 text-blue-600 hover:underline"
+            className="text-blue-600 hover:underline font-medium"
           >
             Voltar
           </button>
@@ -101,13 +103,14 @@ export default function EditarConsulta() {
             Editar Consulta
           </h1>
 
+          {/* MENSAGEM DE ERRO */}
           {erro && (
             <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6">
               {erro}
             </div>
           )}
 
-          {/* ... resto do formulário (igual antes) */}
+          {/* INFORMAÇÕES DA CONSULTA */}
           <div className="grid grid-cols-2 gap-6 mb-8 text-gray-800">
             <div>
               <p className="text-sm text-gray-600">Paciente</p>
@@ -136,15 +139,16 @@ export default function EditarConsulta() {
             </div>
           </div>
 
+          {/* STATUS DA CONSULTA */}
           <div className="mb-8 text-gray-700">
             <label className="flex items-center gap-2 text-green-700 font-semibold mb-3">
-              <CheckCircle2 className="w-5 h-5" />
+              <IconCheckCircle className="w-5 h-5" />
               Status da Consulta
             </label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
+              className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none transition"
             >
               <option value="AGENDADA">Agendada</option>
               <option value="REALIZADA">Realizada</option>
@@ -152,10 +156,11 @@ export default function EditarConsulta() {
             </select>
           </div>
 
+          {/* EMITIR RECEITA (SÓ SE REALIZADA) */}
           {status === 'REALIZADA' && (
             <div className="bg-green-50 border border-green-200 rounded-2xl p-6 mb-8">
               <label className="flex items-center gap-2 text-green-700 font-semibold mb-3">
-                <Pill className="w-5 h-5 " />
+                <IconPill className="w-5 h-5" />
                 Emitir Receita
               </label>
               <input
@@ -163,22 +168,23 @@ export default function EditarConsulta() {
                 placeholder="Medicamento"
                 value={medicamento}
                 onChange={(e) => setMedicamento(e.target.value)}
-                className="w-full p-4 border text-gray-700 border-green-300 rounded-xl mb-3 focus:ring-2 focus:ring-green-500"
+                className="w-full p-4 border border-green-300 text-gray-800 rounded-xl mb-3 focus:ring-2 focus:ring-green-500 focus:outline-none transition"
               />
               <input
                 type="text"
                 placeholder="Dosagem"
                 value={dosagem}
                 onChange={(e) => setDosagem(e.target.value)}
-                className="w-full p-4 border text-gray-700 border-green-300 rounded-xl focus:ring-2 focus:ring-green-500"
+                className="w-full p-4 border border-green-300 text-gray-800 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none transition"
               />
             </div>
           )}
 
+          {/* BOTÃO SALVAR */}
           <button
             onClick={salvar}
             disabled={loading}
-            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:from-green-700 hover:to-emerald-700 disabled:opacity-70 transition shadow-lg"
+            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:from-green-700 hover:to-emerald-700 disabled:opacity-70 transition-all shadow-lg"
           >
             {loading ? 'Salvando...' : 'Salvar Alterações'}
           </button>

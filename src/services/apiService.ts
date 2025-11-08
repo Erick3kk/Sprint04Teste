@@ -1,6 +1,7 @@
 // src/services/apiService.ts
 import { LoginRequest, Paciente } from './types/login';
-import { Consulta, Receita } from './types/consulta';
+import { Consulta, Medico, Receita } from './types/consulta';
+import { AgendamentoPayload } from './types/agendamento';
 
 const API_BASE = 'http://localhost:8080';
 
@@ -89,10 +90,51 @@ class ApiService {
   }
 
   public async getReceitasDaConsulta(idConsulta: number): Promise<Receita[]> {
-  const res = await fetch(`${API_BASE}/receitas/receitaConsulta/${idConsulta}`);
-  if (!res.ok) return [];
-  return await res.json();
-}
+    const res = await fetch(`${API_BASE}/receitas/receitaConsulta/${idConsulta}`);
+    if (!res.ok) return [];
+    return await res.json();
+  }
+
+  // === MÉDICOS ===
+  public async getMedicos(): Promise<Medico[]> {
+    try {
+      const res = await fetch(`${API_BASE}/medicos/listar`);
+      if (!res.ok) {
+        const erro = await res.text();
+        throw new Error(erro || 'Erro ao carregar médicos');
+      }
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      console.error('Erro na API de médicos:', err);
+      throw new Error('Falha na conexão com o servidor');
+    }
+  }
+
+  // === AGENDAMENTO ===
+  public async criarConsulta(payload: AgendamentoPayload): Promise<void> {
+    const res = await fetch(`${API_BASE}/consultas/criar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const erro = await res.text();
+      throw new Error(erro || 'Erro ao agendar consulta');
+    }
+  }
+
+  public getPacienteId(): number | null {
+    const user = localStorage.getItem('usuarioLogado');
+    if (!user) return null;
+    try {
+      const parsed = JSON.parse(user);
+      return parsed.idPaciente ?? null;
+    } catch {
+      return null;
+    }
+  }
 }
 
 export const apiService = new ApiService();

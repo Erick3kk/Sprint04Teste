@@ -1,17 +1,12 @@
-import * as z from 'zod';
+// src/validations/paciente.validation.ts
+import type { PacienteForm } from '../services/types/paciente';
 
-export const pacienteSchema = z.object({
-  NM_NOME: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
-  CD_CPF: z
-    .string()
-    .regex(/^\d{11}$/, 'CPF deve ter 11 dígitos')
-    .transform((val) => val.replace(/\D/g, '')),
-  DT_NASCIMENTO: z.string().min(1, 'Data de nascimento é obrigatória'),
-  NR_TELEFONE: z
-    .string()
-    .min(14, 'Telefone inválido')
-    .transform((val) => val.replace(/\D/g, '')),
-  DS_EMAIL: z.string().email('E-mail inválido'),
-});
-
-export type PacienteForm = z.infer<typeof pacienteSchema>;
+export const validarPaciente = (data: PacienteForm): string | null => {
+  if (!data.nome?.trim() || data.nome.trim().length < 3) return 'Nome é obrigatório';
+  if (!/^\d{11}$/.test(data.cpf.replace(/\D/g, ''))) return 'CPF: 11 dígitos';
+  if (!data.dataNascimento) return 'Data de nascimento é obrigatória';
+  if (!/^\d{10,11}$/.test(data.telefone.replace(/\D/g, ''))) return 'Telefone inválido';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) return 'E-mail inválido';
+  if (!data.idEndereco || data.idEndereco <= 0) return 'Endereço não vinculado';
+  return null;
+};

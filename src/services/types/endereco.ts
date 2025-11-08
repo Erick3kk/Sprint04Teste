@@ -1,4 +1,3 @@
-// src/services/types/endereco.ts
 export interface EnderecoRequest {
   logradouro: string;
   numero: string;
@@ -12,3 +11,14 @@ export interface EnderecoRequest {
 export interface EnderecoResponse {
   idEndereco: number;
 }
+
+
+export type EnderecoForm = {
+  logradouro: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  cep: string;
+};

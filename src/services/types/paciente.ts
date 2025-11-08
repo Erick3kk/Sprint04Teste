@@ -13,3 +13,12 @@ export interface PacienteRequest {
 export interface PacienteResponse {
   idPaciente: number;
 }
+
+export type PacienteForm = {
+  nome: string;
+  cpf: string;
+  dataNascimento: string;
+  telefone: string;
+  email: string;
+  idEndereco: number;
+};
