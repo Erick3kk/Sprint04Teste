@@ -19,7 +19,7 @@ const FaleConosco: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center p-4 md:p-8 bg-hc-fundo min-h-screen">
+    <div className="flex text-gray-700 justify-center p-4 md:p-8 bg-hc-fundo min-h-screen">
       {}
       <div className="w-full max-w-2xl bg-white p-8 rounded-2xl shadow-xl">
         

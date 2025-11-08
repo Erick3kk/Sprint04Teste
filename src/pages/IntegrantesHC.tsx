@@ -8,21 +8,21 @@ const IntegrantesHC: React.FC = () => {
             rm: "563765",
             turma: "1TDSPV",
             githubUrl: "https://github.com/MATHEUSN06", 
-            fotoUrl: "blob:https://web.whatsapp.com/3abc051b-9b67-4429-907c-2a04750e7f15" 
+            fotoUrl: "https://media.discordapp.net/attachments/593926799373631528/1436834885108105326/MatheusFoto.jpg?ex=69110c43&is=690fbac3&hm=e14c785c82466da029af9d3941752ba4e5f27b4cf0e07e4d6a1d8b7af2549441&=&format=webp&width=512&height=910" 
         },
         {
             nome: "Erick Gama",
             rm: "561951",
             turma: "1TDSPV",
             githubUrl: "https://github.com/Erick3kk",
-            fotoUrl: "URL_DA_FOTO_ALPHA"
+            fotoUrl: "https://media.discordapp.net/attachments/593926799373631528/1436834480689250495/ErickFoto.jpg?ex=69110be3&is=690fba63&hm=7bcaf7726e25e4efda3406f474fabec0d8ba4ca049b1b1b7d3d058787c421bf8&=&format=webp&width=683&height=911"
         },
         {
             nome: "Bruno Jacob", 
             rm: "565249",
             turma: "1TDSPV",
             githubUrl: "https://github.com/brunopfnm",
-            fotoUrl: "URL_DA_FOTO_BETA"
+            fotoUrl: "https://media.discordapp.net/attachments/593926799373631528/1436834896503902268/BrunoFoto.jpg?ex=69110c46&is=690fbac6&hm=00aad287351f8cfba74b3aa5bd6bd484f87bdbc0c175a506d655a2040b0640ca&=&format=webp&width=683&height=911"
         },
     ];
 

@@ -18,7 +18,7 @@ const HomeHC: React.FC = () => {
                     </p>
                     {}
                     <a 
-                        href="/agendamento" 
+                        href="/acesso-paciente" 
                         className="inline-block bg-white text-blue-600 font-extrabold text-lg px-12 py-4 rounded-full shadow-xl border-2 border-transparent hover:bg-blue-100 hover:text-blue-800 transition duration-300 transform hover:scale-[1.03] focus:outline-none focus:ring-4 focus:ring-white/90"
                     >
                         Agende Sua Consulta
