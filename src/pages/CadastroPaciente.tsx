@@ -1,14 +1,11 @@
-// src/pages/CadastroPaciente.tsx
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { InputForm } from '../components/InputForm';
 import { Link, useNavigate } from 'react-router-dom';
 
-// TYPES
 import type { EnderecoForm } from '../services/types/endereco';
 import type { PacienteForm } from '../services/types/paciente';
 
-// VALIDAÇÕES
 import { validarEndereco } from '../schemas/enderecoSchema';
 import { validarPaciente } from '../schemas/pacienteSchema';
 
@@ -131,7 +128,7 @@ export default function CadastroPaciente() {
           </div>
         </div>
 
-        {/* ETAPA 1: ENDEREÇO */}
+        {}
         {step === 'endereco' && (
           <form onSubmit={enderecoForm.handleSubmit(onEnderecoSubmit)} className="space-y-5 text-gray-600">
             <InputForm label="Logradouro" name="logradouro" register={enderecoForm.register} errors={enderecoForm.formState.errors} />
@@ -152,7 +149,7 @@ export default function CadastroPaciente() {
           </form>
         )}
 
-        {/* ETAPA 2: PACIENTE */}
+        {}
         {step === 'paciente' && (
           <form onSubmit={pacienteForm.handleSubmit(onPacienteSubmit)} className="space-y-5 text-gray-600">
             <input type="hidden" {...pacienteForm.register('idEndereco', { valueAsNumber: true })} />

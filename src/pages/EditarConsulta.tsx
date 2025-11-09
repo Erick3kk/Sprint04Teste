@@ -1,10 +1,8 @@
-// src/pages/EditarConsulta.tsx
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { apiService } from '../services/apiService';
 import { Consulta } from '../services/types/consulta';
 
-// === ÍCONES CENTRALIZADOS (SEM LUCIDE) ===
 import { IconCheckCircle, IconPill } from '../components/Icons';
 
 export default function EditarConsulta() {
@@ -44,13 +42,11 @@ export default function EditarConsulta() {
     setErro('');
 
     try {
-      // 1. ATUALIZA CONSULTA
       await apiService.atualizarConsulta({
         idConsulta: consulta.idConsulta,
         status: status,
       });
 
-      // 2. CRIA RECEITA SE FOR REALIZADA
       if (status === 'REALIZADA' && medicamento.trim() && dosagem.trim()) {
         await apiService.criarReceita({
           idConsulta: consulta.idConsulta,
@@ -67,7 +63,6 @@ export default function EditarConsulta() {
     }
   };
 
-  // === ESTADO: CARREGANDO ===
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -76,7 +71,6 @@ export default function EditarConsulta() {
     );
   }
 
-  // === ESTADO: ERRO ===
   if (erro && !consulta) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
@@ -103,14 +97,14 @@ export default function EditarConsulta() {
             Editar Consulta
           </h1>
 
-          {/* MENSAGEM DE ERRO */}
+          {}
           {erro && (
             <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6">
               {erro}
             </div>
           )}
 
-          {/* INFORMAÇÕES DA CONSULTA */}
+          {}
           <div className="grid grid-cols-2 gap-6 mb-8 text-gray-800">
             <div>
               <p className="text-sm text-gray-600">Paciente</p>
@@ -139,7 +133,7 @@ export default function EditarConsulta() {
             </div>
           </div>
 
-          {/* STATUS DA CONSULTA */}
+          {}
           <div className="mb-8 text-gray-700">
             <label className="flex items-center gap-2 text-green-700 font-semibold mb-3">
               <IconCheckCircle className="w-5 h-5" />
@@ -156,7 +150,7 @@ export default function EditarConsulta() {
             </select>
           </div>
 
-          {/* EMITIR RECEITA (SÓ SE REALIZADA) */}
+          {}
           {status === 'REALIZADA' && (
             <div className="bg-green-50 border border-green-200 rounded-2xl p-6 mb-8">
               <label className="flex items-center gap-2 text-green-700 font-semibold mb-3">
@@ -180,7 +174,7 @@ export default function EditarConsulta() {
             </div>
           )}
 
-          {/* BOTÃO SALVAR */}
+          {}
           <button
             onClick={salvar}
             disabled={loading}

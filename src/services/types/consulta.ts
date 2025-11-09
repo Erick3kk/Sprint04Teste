@@ -1,5 +1,4 @@
-// src/services/types/consulta.ts
-// src/services/types/consulta.ts
+
 export interface Consulta {
   idConsulta: number;
   dataHora: string;

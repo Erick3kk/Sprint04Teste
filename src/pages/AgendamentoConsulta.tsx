@@ -1,4 +1,3 @@
-// src/pages/AgendamentoConsulta.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiService } from '../services/apiService';
@@ -24,7 +23,6 @@ export default function AgendamentoConsulta() {
     }
   }, [idPaciente, navigate]);
 
-  // === CARREGA MÉDICOS ===
   useEffect(() => {
     if (!idPaciente) return;
 
@@ -44,7 +42,6 @@ export default function AgendamentoConsulta() {
     carregar();
   }, [idPaciente]);
 
-  // === AGENDAR ===
   const agendar = async () => {
     if (!idPaciente || !medicoId || !data || !hora) {
       setErro('Preencha todos os campos');
@@ -106,7 +103,7 @@ export default function AgendamentoConsulta() {
 
           <div className="space-y-7">
 
-            {/* MÉDICO */}
+            {}
             <div>
               <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
                 <IconStethoscope className="w-5 h-5 text-blue-600" />
@@ -137,7 +134,7 @@ export default function AgendamentoConsulta() {
               )}
             </div>
 
-            {/* DATA */}
+            {}
             {medicoId && (
               <div>
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
@@ -154,7 +151,7 @@ export default function AgendamentoConsulta() {
               </div>
             )}
 
-            {/* HORÁRIO */}
+            {}
             {data && (
               <div>
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">

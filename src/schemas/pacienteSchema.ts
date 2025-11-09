@@ -1,4 +1,3 @@
-// src/validations/paciente.validation.ts
 import type { PacienteForm } from '../services/types/paciente';
 
 export const validarPaciente = (data: PacienteForm): string | null => {
