@@ -1,4 +1,3 @@
-// src/services/apiService.ts
 import { LoginRequest, Paciente } from './types/login';
 import { Consulta, Receita } from './types/consulta';
 
@@ -7,7 +6,6 @@ const API_BASE = 'https://challengejavasprint04-1.onrender.com';
 class ApiService {
   private readonly KEY = 'usuarioLogado';
 
-  // === LOGIN ===
   public async login(dados: LoginRequest): Promise<Paciente> {
     const res = await fetch(`${API_BASE}/login`, {
       method: 'POST',
@@ -38,7 +36,6 @@ class ApiService {
     localStorage.removeItem(this.KEY);
   }
 
-  // === CONSULTAS ===
   public async getConsultasDoPaciente(idPaciente: number): Promise<Consulta[]> {
     const res = await fetch(`${API_BASE}/consultas/consultaPaciente/${idPaciente}`);
     if (!res.ok) throw new Error('Erro ao carregar consultas');
@@ -68,7 +65,6 @@ class ApiService {
     }
   }
 
-  // === RECEITAS ===
   public async criarReceita(dados: {
     idConsulta: number;
     medicamento: string;
@@ -90,7 +86,7 @@ class ApiService {
 
   public async getReceitasDaConsulta(idConsulta: number): Promise<Receita[]> {
     const res = await fetch(`${API_BASE}/receitas/receitaConsulta/${idConsulta}`);
-    if (!res.ok) return []; // Silencioso se não tiver
+    if (!res.ok) return []; 
     return await res.json();
   }
 }

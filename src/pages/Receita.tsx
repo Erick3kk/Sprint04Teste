@@ -1,10 +1,8 @@
-// src/pages/Receita.tsx
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { apiService } from '../services/apiService';
 import { Receita } from '../services/types/receita';
 
-// === ÍCONES CENTRALIZADOS (SEM LUCIDE) ===
 import { IconArrowLeft, IconPill, IconCalendar, IconUser } from '../components/Icons';
 
 export default function ReceitaPage() {
@@ -53,7 +51,6 @@ export default function ReceitaPage() {
       year: 'numeric',
     });
 
-  // === ESTADO: CARREGANDO ===
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -62,7 +59,6 @@ export default function ReceitaPage() {
     );
   }
 
-  // === ESTADO: ERRO ===
   if (erro) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
@@ -79,7 +75,6 @@ export default function ReceitaPage() {
     );
   }
 
-  // === ESTADO: SEM RECEITA ===
   if (receitas.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
@@ -97,11 +92,10 @@ export default function ReceitaPage() {
     );
   }
 
-  // === ESTADO: SUCESSO ===
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-6">
       <div className="max-w-3xl mx-auto">
-        {/* BOTÃO VOLTAR */}
+        {}
         <button
           onClick={() => navigate('/dashboard-paciente')}
           className="mb-6 text-emerald-700 hover:text-emerald-900 flex items-center gap-2 font-medium transition-colors"
@@ -116,7 +110,7 @@ export default function ReceitaPage() {
               key={receita.idReceita}
               className="bg-white rounded-3xl shadow-2xl p-8 border-2 border-green-200"
             >
-              {/* TÍTULO + ID */}
+              {}
               <div className="flex items-center justify-between mb-6">
                 <h1 className="text-3xl font-bold text-green-800 flex items-center gap-3">
                   <IconPill className="w-8 h-8" />
@@ -127,7 +121,7 @@ export default function ReceitaPage() {
                 </span>
               </div>
 
-              {/* INFORMAÇÕES DA CONSULTA */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-6 bg-green-50 rounded-2xl">
                 <div>
                   <p className="text-sm text-green-700 font-semibold">Consulta</p>
@@ -153,7 +147,7 @@ export default function ReceitaPage() {
                 </div>
               </div>
 
-              {/* PRESCRIÇÃO */}
+              {}
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl border border-green-300">
                 <h2 className="text-xl font-bold text-green-800 mb-4">Prescrição</h2>
                 <div className="space-y-3">
@@ -168,7 +162,7 @@ export default function ReceitaPage() {
                 </div>
               </div>
 
-              {/* RODAPÉ */}
+              {}
               <div className="mt-8 text-center text-sm text-gray-500">
                 <p>Esta receita é válida por 30 dias a partir da data da consulta.</p>
                 <p className="mt-1">Emitida pelo sistema Hospital Clínicas</p>

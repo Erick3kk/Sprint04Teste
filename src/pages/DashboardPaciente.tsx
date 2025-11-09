@@ -31,13 +31,11 @@ export default function DashboardPaciente() {
     setLoading(true);
     setErro('');
 
-    // 1. CARREGA CONSULTAS
     apiService
       .getConsultasDoPaciente(user.idPaciente)
       .then(async (consultasList) => {
         setConsultas(consultasList);
 
-        // 2. CARREGA RECEITAS DE CADA CONSULTA REALIZADA
         const receitasPromises = consultasList
           .filter((c) => c.status === 'REALIZADA')
           .map((c) => apiService.getReceitasDaConsulta(c.idConsulta));
@@ -77,7 +75,6 @@ export default function DashboardPaciente() {
     }
   };
 
-  // === ESTADO: CARREGANDO ===
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -94,7 +91,7 @@ export default function DashboardPaciente() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
       <div className="max-w-5xl mx-auto">
-        {/* HEADER */}
+        {}
         <div className="bg-white rounded-3xl shadow-2xl p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
             <button
@@ -134,14 +131,14 @@ export default function DashboardPaciente() {
           </div>
         </div>
 
-        {/* ERRO */}
+        {}
         {erro && (
           <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6">
             {erro}
           </div>
         )}
 
-        {/* CONSULTAS */}
+        {}
         <div className="space-y-6 text-gray-800">
           {consultas.length === 0 ? (
             <div className="bg-white rounded-3xl shadow-xl p-12 text-center">

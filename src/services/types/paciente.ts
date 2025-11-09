@@ -1,4 +1,3 @@
-// src/services/types/paciente.ts
 export interface PacienteRequest {
   nome: string;
   cpf: string;

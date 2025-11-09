@@ -1,4 +1,3 @@
-// src/validations/login.validation.ts
 import type { LoginRequest } from '../services/types/login';
 
 export const validarLogin = (data: LoginRequest): string | null => {

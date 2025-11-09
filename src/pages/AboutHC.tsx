@@ -14,7 +14,7 @@ const AboutHC: React.FC = () => {
       <div className="container mx-auto max-w-6xl">
         
         {}
-        <header className="text-center mb-12 bg-white p-8 rounded-xl shadow-xl border-b-4 border-hc-principal/50"> {/* Sombra e borda mais destacadas */}
+        <header className="text-center mb-12 bg-white p-8 rounded-xl shadow-xl border-b-4 border-hc-principal/50"> {}
           {}
           <h1 className="text-4xl text-gray-700 lg:text-5xl font-extrabold text-hc-principal mb-4">
             Sobre o Hospital das Clínicas
@@ -27,7 +27,7 @@ const AboutHC: React.FC = () => {
 
         {}
         <section className="bg-white p-8 rounded-xl shadow-lg mb-12">
-            <h2 className="text-3xl text-gray-700 font-extrabold text-hc-principal mb-6 border-b-4 border-hc-secundaria pb-2"> {/* Borda mais grossa */}
+            <h2 className="text-3xl text-gray-700 font-extrabold text-hc-principal mb-6 border-b-4 border-hc-secundaria pb-2"> {}
                 Nossa História e Impacto
             </h2>
             <p className="text-gray-700 text-lg leading-relaxed mb-6">
