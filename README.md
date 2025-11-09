@@ -1,73 +1,160 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+  # PromptMedic 
 
-Currently, two official plugins are available:
+O futuro nos move !!
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+##  Objetivo
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+O **objetivo da PromptMedic** é otimizar e automatizar o atendimento médico digital, oferecendo uma plataforma inteligente que auxilia profissionais e instituições de saúde no diagnóstico, triagem e gestão de pacientes. A solução utiliza inteligência artificial para **agilizar a comunicação entre médico e paciente**, **reduzir o tempo de espera**, **melhorar a precisão das informações clínicas** e **aumentar a eficiência operacional** em clínicas, hospitais e serviços de telemedicina.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## &#x20;Como usar / Guia rápido
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Instalação (local)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+```bash
+# clonar
+git clone https://github.com/Erick3kk/ChallengeFrontEndHC
+git clone 
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# instalar dependências (exemplo Node)
+npm install
+
+# rodar em modo dev
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Tecnologias
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+* **Frontend:** React + TypeScript,18.2+,Interface reativa e tipada
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+  ,Vite,5.0+,Build ultra-rápida e HMR
+
+  ,Tailwind CSS,3.4+,"Estilização utilitária, sem CSS manual"
+
+  ,React Router DOM,6.20+,"Navegação SPA com useNavigate, useSearchParams"
+
+  ,fetch API (nativo),—,Requisições HTTP (sem Axios)
+
+  ,localStorage,—,Armazenamento do usuário logado
+
+  ,SVG Custom Icons,—,Ícones centralizados em Icons.tsx
+
+  ,ESLint + Prettier,—,Código limpo e padronizado\
+
+* Backend: Java,API RESTful em http://localhost:8080
+
+  ,Spring Web, Endpoints HTTP
+
+  ,Lombok, Redução de boilerplate
+
+  ,Maven, Gerenciador de dependências
+
+### Estrutura de pastas
+
 ```
+/ Sprint04
+├─/public
+vite.svg
+├─/src
+├─ 
+│  ├─ /assets
+  react.svg
+│  ├─ /components
+  FAQIrem.tsx
+  FooterHC.tsx
+  HeaderHC.tsx
+  Icons.tsx
+  InputForm.tsx
+  IntegrantesCard.tsx
+  layoutHC.tsx
+  ProtectedRoute.tsx
+  ServiceCard.tsx
+│  ├─ /pages
+  AboutHC.tsx
+  AcessoPaciente.tsx
+  AgendamentoConsulta
+  AgendamentoOnline.tsx
+  DashboardPaciente.tsx
+  EditarConcultas.tsx
+  FaleConosco.tsx
+  HomeHC.tsx
+  IntegrantesHC.tsx
+  NotFound.tsx
+  Receita.tsx
+  SuporteVirtual.tsx
+  
+│  └─ schemas
+  agendamentoSchema.tsx
+  enderecoSchema.ts
+  index.ts
+  loginShema.ts
+├─ services
+   App.tsx
+   index.css
+   main.tsx
+gitinore
+eslint.config.js
+index.html
+package-lock.json
+package.json
+postcss.config.js
+README.MD
+tailwind.app.json
+tsconfig.node.json
+tsconfig.node.json
+vite.config.ts
+```
+
+###
+
+---
+
+## Integrantes
+
+* Erick de Faria Gama — RM561951
+* Bruno Jacob — RM565249
+* Matheus Nascimento Corrégio — RM563764
+
+> GITHUB de cada INTEGRANTES 
+>
+> * brunopfnm
+> * Erick3kk
+> * **MATHEUSN06**
+
+##
+
+🏥 Sobre o Projeto
+
+🧠 Inteligência Artificial aplicada à área médica  
+
+📋 Sistema de triagem e apoio ao diagnóstico  
+
+⚙️ Automação do fluxo de atendimento digital  
+
+🌐 Interface interativa e responsiva  
+
+## Links importantes
+
+* **Link do repositório GitHub:** [https://github.com/Erick3kk/ChallengeFrontEndHC](https://github.com/Erick3kk/ChallengeFrontEndHC)
+
+* **Link do vídeo no YouTube:** [https://www.youtube.com/watch?v=8rX-LvC3RHw](https://www.youtube.com/watch?v=8rX-LvC3RHw)
+
+## Ícones usados 
+
+* IconArrowLeft
+* IconCheckCircle
+* IconClock
+* IconStethoscope
+* IconCheck
+* IconUser
+* iconMail
+* IconPhone
+* IconPill
+* IconCalendar
+* IconHome
+* IconLogout
+
